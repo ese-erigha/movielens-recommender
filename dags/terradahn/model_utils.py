@@ -3,7 +3,7 @@ import os
 import neptune
 import pickle
 
-neptuneAPIKey = "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiJjMTk0ZGZmZi1jMzMyLTQ5NDktYjFkYy03Y2JlNDIyY2VjZjEifQ=="
+neptuneAPIKey = "A"
 
 def init_project(key, name):
     model_version = neptune.init_model_version(
