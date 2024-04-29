@@ -33,12 +33,6 @@ with DAG(
     schedule="@once"
     ) as dag:
 
-    # @task()
-    # def test_airflow():
-    #     print("Executed using Apache Airflow ✨")
-
-    # test_airflow()
-
     @task_group()
     def svdpp_recommender():
 
