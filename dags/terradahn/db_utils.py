@@ -1,14 +1,11 @@
 import logging
 import psycopg2
 
+from .config import postgres_config
+
 class Database:
     def __init__(self):
-        db_config = {
-            "user": "airflow",
-            "password": "airflow",
-            "database": "ariflow"
-        }
-        conn = psycopg2.connect(**db_config)
+        conn = psycopg2.connect(**postgres_config)
         self.connection = conn
         logging.info("PostgreSQL connection is open")
 
@@ -29,7 +26,7 @@ class Database:
             cursor.close()
         except (psycopg2.DatabaseError, Exception) as error:
             logging.error("Error running query")
-            logging.error("Error running query")
+            logging.error(error)
             self.close_connection()
             raise error
 
