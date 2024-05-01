@@ -1,3 +1,5 @@
+import os
+
 neptune_config = dict(
     api_key = os.getenv('NEPTUNE_API_KEY')
 )

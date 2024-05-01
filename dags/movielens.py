@@ -7,7 +7,7 @@ from airflow.decorators import task
 from airflow.decorators import task_group
 from airflow.operators.python import PythonOperator
 
-from terradahn import file_utils, dataset_utils, db_utils, recommender
+from terradahn import file_utils, dataset_utils, db_utils, svdpp_model
 
 AIRFLOW_HOME = os.environ.get('AIRFLOW_HOME', '/opt/airflow/')
 dataset_path = f'{AIRFLOW_HOME}/dags/dataset/'
@@ -56,7 +56,7 @@ with DAG(
 
         build_svdpp_model_task = PythonOperator(
             task_id="build_svdpp_model_task", 
-            python_callable=recommender.build_svd_model,
+            python_callable=svdpp_model.build_model,
             op_kwargs={"dataset_path": ratings_dataset_path, "model_path": svdpp_model_path}
         )
 
