@@ -6,9 +6,6 @@ import pandas as pd
 from .model_utils import save_to_pickle, init_neptune_model
 from .config import neptune_config
 
-neptune_project_key = "MOVIELENS"
-neptune_project_name = "ese.erigha/movielens-recommender"
-
 
 def clean_data(movies):
     # Determine the number of movies without genres
