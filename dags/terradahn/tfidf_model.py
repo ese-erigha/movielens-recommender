@@ -2,7 +2,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.model_selection import GridSearchCV
 import pandas as pd
-import numpy as np
 
 from .model_utils import save_to_pickle, init_neptune_model
 
@@ -28,7 +27,7 @@ def clean_data(movies):
     movies['genres_cleaned'] = movies['genres_cleaned'].str.replace('Film-Noir','Noir')
     
     return movies
-    
+
 
 
 def build_model(dataset_path, model_path):
