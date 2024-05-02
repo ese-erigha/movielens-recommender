@@ -4,6 +4,7 @@ from sklearn.model_selection import GridSearchCV
 import pandas as pd
 
 from .model_utils import save_to_pickle, init_neptune_model
+from .config import neptune_config
 
 neptune_project_key = "MOVIELENS"
 neptune_project_name = "ese.erigha/movielens-recommender"
@@ -57,8 +58,8 @@ def build_model(dataset_path, model_path):
     model_utils.save_to_pickle(sim_matrix, model_path)
 
     # Save model to Neptune.ai
-    model_name = neptune_project_key+'-'+'TFIDF'
-    neptune_model = model_utils.init_neptune_model(model_name, neptune_project_name)
+    model_name = neptune_config["project_key"]+'-'+'TFIDF'
+    neptune_model = model_utils.init_neptune_model(model_name, neptune_config["project_name"])
     neptune_model["model/parameters"] = tfidf_vector.get_params()
     neptune_model["model/binary"].upload(model_path)
     neptune_model.stop()

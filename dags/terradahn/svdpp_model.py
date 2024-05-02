@@ -7,9 +7,7 @@ from surprise.model_selection import train_test_split
 from surprise.model_selection import GridSearchCV
 
 from .model_utils import save_to_pickle, init_neptune_model
-
-neptune_project_key = "MOVIELENS"
-neptune_project_name = "ese.erigha/movielens-recommender"
+from .config import neptune_config
 
 
 def build_model(dataset_path, model_path):
@@ -49,8 +47,8 @@ def build_model(dataset_path, model_path):
     model_utils.save_to_pickle(algo, model_path)
 
     # Save model to Neptune.ai
-    model_name = neptune_project_key+'-'+'SVDPP'
-    neptune_model = model_utils.init_neptune_model(model_name, neptune_project_name)
+    model_name = neptune_config["project_key"]+'-'+'SVDPP'
+    neptune_model = model_utils.init_neptune_model(model_name, neptune_config["project_name"])
     neptune_model["model/parameters"] = grid_search.best_params["rmse"]
     neptune_model["validation/acc"] = grid_search.best_score["rmse"]
     neptune_model["model/binary"].upload(model_path)
