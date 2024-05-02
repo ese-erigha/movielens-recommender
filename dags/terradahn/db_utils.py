@@ -3,49 +3,84 @@ import psycopg2
 
 from .config import postgres_config
 
-class Database:
-    def __init__(self):
-        conn = psycopg2.connect(**postgres_config)
-        self.connection = conn
-        logging.info("PostgreSQL connection is open")
-
-    def close_connection():
-        if self.connection is not None: 
-                self.connection.close()
-                logging.info("PostgreSQL connection is closed")
-
-    def run_operation(self, queries: list[dict[str, tuple]]):
-        try:
-
-            cursor = self.connection.cursor()
-
-            for query in queries:
-                cursor.execute(query["command"],query["values"])
-            
-            self.connection.commit()
-            cursor.close()
-        except (psycopg2.DatabaseError, Exception) as error:
-            logging.error("Error running query")
-            logging.error(error)
-            self.close_connection()
-            raise error
-
-    def insert_one(self, query: dict[str, tuple]):
-        self.run_operation([query])
-
-    def insert_many(self, queries):
-        self.run_operation(queries)
-
-    def create_table(self, query):
-        self.run_operation([query])
-
 
 def create_users_table():
-    user_table_creation_command = """
-                    CREATE TABLE IF NOT EXISTS users (
-                        id INTEGER PRIMARY KEY
-                    )
-                """
-    db = Database()
-    db.create_table(user_table_creation_command)
-    db.close_connection()
+    users_table_creation_command = """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY
+            )
+    """
+    create_table(users_table_creation_command)
+
+
+
+def create_movies_table():
+    movies_table_creation_command = """
+        CREATE TABLE IF NOT EXISTS movies (
+            id INTEGER PRIMARY KEY,
+            title VARCHAR (255) UNIQUE NOT NULL,
+            genres VARCHAR (255) NOT NULL,
+            average_rating INTEGER NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        )
+    """
+
+    create_table(movies_table_creation_command)
+
+
+
+def create_table(query):
+    conn = None
+    cursor = None
+    try:
+        conn = psycopg2.connect(**postgres_config)
+        cursor = conn.cursor()
+
+        cursor.execute(query)
+
+        conn.commit()
+        cursor.close() 
+        conn.close()
+    except (psycopg2.DatabaseError, Exception) as error:
+        logging.error("Error running query")
+        logging.error(error)
+        if conn is not None:
+            conn.rollback()
+            cursor.close() 
+            conn.close()
+            logging.info("PostgreSQL connection is closed")
+        raise error
+
+
+def insert_dataframe(table, dataframe):
+    conn = None
+    cursor = None
+    try:
+        conn = psycopg2.connect(**postgres_config)
+
+        # Create a list of tupples from the dataframe values
+        tuples = [tuple(x) for x in dataframe.to_numpy()]
+
+        # Comma-separated dataframe columns
+        cols = ','.join(list(dataframe.columns))
+
+        # SQL quert to execute
+        query  = "INSERT INTO %s(%s) VALUES %%s ON CONFLICT (id) DO NOTHING" % (table, cols)
+        cursor = conn.cursor()
+
+        psycopg2.extras.execute_values(cursor, query, tuples)
+        conn.commit()
+        cursor.close() 
+        conn.close()
+    except (psycopg2.DatabaseError, Exception) as error:
+        logging.error("Error running query")
+        logging.error(error)
+        if conn is not None:
+            conn.rollback()
+            cursor.close() 
+            conn.close()
+            logging.info("PostgreSQL connection is closed")
+        raise error
+    
+
+

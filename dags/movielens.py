@@ -7,7 +7,7 @@ from airflow.decorators import task
 from airflow.decorators import task_group
 from airflow.operators.python import PythonOperator
 
-from terradahn import file_utils, dataset_utils, db_utils, svdpp_model
+from terradahn import file_utils, dataset_utils, db_utils, svdpp_model, tfidf_model
 
 AIRFLOW_HOME = os.environ.get('AIRFLOW_HOME', '/opt/airflow/')
 dataset_path = f'{AIRFLOW_HOME}/dags/dataset/'
@@ -34,13 +34,24 @@ with DAG(
     ) as dag:
 
     @task_group()
-    def svdpp_recommender():
+    def fetch_datasets():
 
         fetch_ratings_task = PythonOperator(
             task_id="fetch_ratings_task", 
             python_callable=file_utils.save_dataset,
             op_kwargs= { "url": ratings_dataset_url, "file_path": ratings_dataset_path }
         )
+
+        fetch_movies_task = PythonOperator(
+            task_id="fetch_movies_task", 
+            python_callable=file_utils.save_dataset,
+            op_kwargs= { "url": movies_dataset_url, "file_path": movies_dataset_path }
+        )
+
+        [fetch_ratings_task, fetch_movies_task]
+
+    @task_group()
+    def create_users():
 
         create_users_table_task = PythonOperator(
             task_id="create_users_table_task", 
@@ -53,6 +64,26 @@ with DAG(
             op_kwargs = { "dataset_path": ratings_dataset_path }
         )
 
+        create_users_table_task >> insert_users_task
+
+    @task_group
+    def create_movies():
+
+        create_movies_table_task = PythonOperator(
+            task_id="create_movies_table_task", 
+            python_callable=db_utils.create_movies_table
+        )
+
+        insert_movies_task = PythonOperator(
+            task_id="insert_movies_task", 
+            python_callable=dataset_utils.insert_movies_into_table,
+            op_kwargs = { "movies_dataset_path": movies_dataset_path, "ratings_dataset_path": ratings_dataset_path }
+        )
+
+        create_movies_table_task >> insert_movies_task
+    
+    @task_group
+    def build_models():
 
         build_svdpp_model_task = PythonOperator(
             task_id="build_svdpp_model_task", 
@@ -60,7 +91,17 @@ with DAG(
             op_kwargs={"dataset_path": ratings_dataset_path, "model_path": svdpp_model_path}
         )
 
-    svdpp_recommender()
+        build_tfidf_model_task = PythonOperator(
+            task_id="build_tfidf_model_task", 
+            python_callable=tfidf_model.build_model,
+            op_kwargs={"dataset_path": movies_dataset_path, "model_path": tfidf_linear_kernel_model_path}
+        )
+
+        [build_svdpp_model_task, build_tfidf_model_task]
+
+
+
+    # fetch_datasets() >> [create_users(), create_movies()] >> build_models()
 
 
     # Expose Recommender systems API
