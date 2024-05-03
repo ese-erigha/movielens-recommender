@@ -11,3 +11,9 @@ postgres_config = dict(
     password = os.getenv('POSTGRES_PASSWORD'),
     database = os.getenv('POSTGRES_DB'),
 )
+
+table_names = dict(
+    user = "users",
+    movie = "movies",
+    cbr = "cbr_predictions"
+)

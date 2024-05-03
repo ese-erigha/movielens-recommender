@@ -5,17 +5,16 @@ from .config import postgres_config
 
 
 def create_users_table():
-    users_table_creation_command = """
+    table_command = """
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY
             )
     """
-    create_table(users_table_creation_command)
-
+    create_table(table_command)
 
 
 def create_movies_table():
-    movies_table_creation_command = """
+    table_command = """
         CREATE TABLE IF NOT EXISTS movies (
             id INTEGER PRIMARY KEY,
             title VARCHAR (255) UNIQUE NOT NULL,
@@ -25,8 +24,19 @@ def create_movies_table():
         )
     """
 
-    create_table(movies_table_creation_command)
+    create_table(table_command)
 
+
+def create_cbr_predictions_table():
+    table_command = """
+        CREATE TABLE IF NOT EXISTS cbr_predictions (
+            movie_id INTEGER NOT NULL,
+            sim_movie_id INTEGER NOT NULL,
+            score NUMERIC(5,2) NOT NULL
+        )
+    """
+
+    create_table(table_command)
 
 
 def create_table(query):
@@ -39,14 +49,14 @@ def create_table(query):
         cursor.execute(query)
 
         conn.commit()
-        cursor.close() 
+        cursor.close()
         conn.close()
     except (psycopg2.DatabaseError, Exception) as error:
         logging.error("Error running query")
         logging.error(error)
         if conn is not None:
             conn.rollback()
-            cursor.close() 
+            cursor.close()
             conn.close()
             logging.info("PostgreSQL connection is closed")
         raise error
@@ -58,29 +68,26 @@ def insert_dataframe(table, dataframe):
     try:
         conn = psycopg2.connect(**postgres_config)
 
-        # Create a list of tupples from the dataframe values
+        # Create a list of tuples from the dataframe values
         tuples = [tuple(x) for x in dataframe.to_numpy()]
 
         # Comma-separated dataframe columns
         cols = ','.join(list(dataframe.columns))
 
-        # SQL quert to execute
-        query  = "INSERT INTO %s(%s) VALUES %%s ON CONFLICT (id) DO NOTHING" % (table, cols)
+        # SQL query to execute
+        query = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)
         cursor = conn.cursor()
 
         psycopg2.extras.execute_values(cursor, query, tuples)
         conn.commit()
-        cursor.close() 
+        cursor.close()
         conn.close()
     except (psycopg2.DatabaseError, Exception) as error:
         logging.error("Error running query")
         logging.error(error)
         if conn is not None:
             conn.rollback()
-            cursor.close() 
+            cursor.close()
             conn.close()
             logging.info("PostgreSQL connection is closed")
         raise error
-    
-
-

@@ -5,6 +5,7 @@ import pickle
 
 from .config import neptune_config
 
+
 def init_neptune_model(name, project):
     model_version = neptune.init_model_version(
         model=name,
@@ -13,6 +14,7 @@ def init_neptune_model(name, project):
     )
 
     return model_version
+
 
 def save_to_pickle(model, file_path):
     pickle.dump(model, os.open(file_path, 'wb'))
