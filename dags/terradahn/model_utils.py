@@ -3,14 +3,14 @@ import os
 import neptune
 import pickle
 
-from .config import neptune_config
+from .config import settings
 
 
 def init_neptune_model(name, project):
     model_version = neptune.init_model_version(
         model=name,
         project=project,
-        api_token=neptune_config["api_key"],
+        api_token=settings.neptune_config.api_key,
     )
 
     return model_version

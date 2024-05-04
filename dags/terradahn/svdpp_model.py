@@ -2,12 +2,12 @@ import pandas as pd
 from surprise import Dataset
 from surprise import Reader
 from surprise import SVDpp
-from surprise import accuracy
-from surprise.model_selection import train_test_split
+# from surprise import accuracy
+# from surprise.model_selection import train_test_split
 from surprise.model_selection import GridSearchCV
 
 from .model_utils import save_to_pickle, init_neptune_model
-from .config import neptune_config, table_names
+from .config import settings
 from .db_utils import insert_dataframe, create_svdpp_predictions_table
 
 
@@ -57,7 +57,7 @@ def save_recommendations(algo, ratings_df, movies_df):
             create_svdpp_predictions_table()
 
             # Insert predictions into the database
-            insert_dataframe(table_names["svdpp"], new_df)
+            insert_dataframe(settings.table.svdpp, new_df)
 
 
 def build_model(ratings_dataset_path, movies_dataset_path, model_path):
@@ -102,8 +102,8 @@ def build_model(ratings_dataset_path, movies_dataset_path, model_path):
     save_to_pickle(algo, model_path)
 
     # Save model to Neptune.ai
-    model_name = neptune_config["project_key"] + '-' + 'SVDPP'
-    neptune_model = init_neptune_model(model_name, neptune_config["project_name"])
+    model_name = settings.neptune_config.project_key + '-' + 'SVDPP'
+    neptune_model = init_neptune_model(model_name, settings.neptune_config.project_name)
     neptune_model["model/parameters"] = grid_search.best_params["rmse"]
     neptune_model["validation/acc"] = grid_search.best_score["rmse"]
     neptune_model["model/binary"].upload(model_path)

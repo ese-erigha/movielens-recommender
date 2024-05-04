@@ -1,11 +1,10 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from sklearn.model_selection import GridSearchCV
 import pandas as pd
 
 from .model_utils import save_to_pickle, init_neptune_model
 from .db_utils import insert_dataframe, create_cbr_predictions_table
-from .config import neptune_config, table_names
+from .config import settings
 
 
 def clean_data(movies):
@@ -61,7 +60,7 @@ def save_recommendations(sim_matrix, df):
             create_cbr_predictions_table()
 
             # Insert similar movies into database
-            insert_dataframe(table_names["cbr"], new_df)
+            insert_dataframe(settings.table.cbr, new_df)
 
 
 def build_model(dataset_path, model_path):
@@ -94,8 +93,8 @@ def build_model(dataset_path, model_path):
     save_to_pickle(sim_matrix, model_path)
 
     # Save model to Neptune.ai
-    model_name = neptune_config["project_key"] + '-' + 'TFIDF'
-    neptune_model = init_neptune_model(model_name, neptune_config["project_name"])
+    model_name = settings.neptune_config.project_key + '-' + 'TFIDF'
+    neptune_model = init_neptune_model(model_name, settings.neptune_config.project_name)
     neptune_model["model/parameters"] = tfidf_vector.get_params()
     # neptune_model["model/binary"].upload(model_path)
     neptune_model.stop()

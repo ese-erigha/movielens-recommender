@@ -1,8 +1,7 @@
 import pandas as pd
 
 from .db_utils import insert_dataframe
-from .config import table_names
-
+from .config import settings
 
 def insert_users_into_table(dataset_path):
     ratings_df = pd.read_csv(dataset_path)
@@ -11,7 +10,7 @@ def insert_users_into_table(dataset_path):
     data = {'id': all_users}
     df = pd.DataFrame(data)
 
-    insert_dataframe(table_names["user"], df)
+    insert_dataframe(settings.table.user, df)
 
 
 def insert_movies_into_table(movies_dataset_path, ratings_dataset_path):
@@ -24,4 +23,4 @@ def insert_movies_into_table(movies_dataset_path, ratings_dataset_path):
     merged_df.rename(columns={"rating": "average_rating", "movieId": "id"}, inplace=True)
     merged_df['average_rating'] = merged_df['average_rating'].fillna(0)
 
-    insert_dataframe(table_names["movie"], merged_df)
+    insert_dataframe(settings.table.movie, merged_df)

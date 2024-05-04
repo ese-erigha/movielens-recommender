@@ -1,16 +1,32 @@
 import os
-
-neptune_config = dict(
-    api_key=os.getenv('NEPTUNE_API_KEY'),
-    project_key="MOVIELENS",
-    project_name="ese.erigha/movielens-recommender",
+from pydantic import (
+    BaseModel
 )
+from pydantic_settings import BaseSettings
 
-postgres_config = dict(
-    user=os.getenv('POSTGRES_USER'),
-    password=os.getenv('POSTGRES_PASSWORD'),
-    database=os.getenv('POSTGRES_DB'),
-)
+class NeptuneConfig(BaseModel):
+    api_key: str = os.getenv('NEPTUNE_API_KEY')
+    project_key: str = "MOVIELENS"
+    project_name: str = "ese.erigha/movielens-recommender"
+
+class PostgresConfig(BaseModel):
+    user: str = os.getenv('POSTGRES_USER')
+    password: str = os.getenv('POSTGRES_PASSWORD')
+    database: str = os.getenv('POSTGRES_DB')
+
+class TableNames(BaseModel):
+    user: str = "users"
+    movie: str = "movies"
+    cbr: str = "cbr_predictions"
+    svdpp: str = "svdpp_predictions"
+
+class Settings(BaseSettings):
+    neptune_config: NeptuneConfig = NeptuneConfig()
+    postgres_config: PostgresConfig = PostgresConfig()
+    table: TableNames = TableNames()
+
+settings = Settings()
+
 
 table_names = dict(
     user="users",

@@ -1,7 +1,7 @@
 import logging
 import psycopg2
 
-from .config import postgres_config
+from .config import settings
 
 
 def create_users_table():
@@ -54,7 +54,7 @@ def create_table(query):
     conn = None
     cursor = None
     try:
-        conn = psycopg2.connect(**postgres_config)
+        conn = psycopg2.connect(**settings.postgres_config)
         cursor = conn.cursor()
 
         cursor.execute(query)
@@ -77,7 +77,7 @@ def insert_dataframe(table, dataframe):
     conn = None
     cursor = None
     try:
-        conn = psycopg2.connect(**postgres_config)
+        conn = psycopg2.connect(**settings.postgres_config)
 
         # Create a list of tuples from the dataframe values
         tuples = [tuple(x) for x in dataframe.to_numpy()]
