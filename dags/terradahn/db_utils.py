@@ -19,8 +19,7 @@ def create_movies_table():
             id INTEGER PRIMARY KEY,
             title VARCHAR (255) UNIQUE NOT NULL,
             genres VARCHAR (255) NOT NULL,
-            average_rating INTEGER NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            average_rating INTEGER NOT NULL
         )
     """
 
@@ -32,6 +31,18 @@ def create_cbr_predictions_table():
         CREATE TABLE IF NOT EXISTS cbr_predictions (
             movie_id INTEGER NOT NULL,
             sim_movie_id INTEGER NOT NULL,
+            score NUMERIC(5,2) NOT NULL
+        )
+    """
+
+    create_table(table_command)
+
+
+def create_svdpp_predictions_table():
+    table_command = """
+        CREATE TABLE IF NOT EXISTS svdpp_predictions (
+            user_id INTEGER NOT NULL,
+            movie_id INTEGER NOT NULL,
             score NUMERIC(5,2) NOT NULL
         )
     """
