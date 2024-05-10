@@ -10,7 +10,7 @@ def create_users_table():
             id INTEGER PRIMARY KEY
             )
     """
-    create_table(table_command)
+    run_db_command(table_command)
 
 
 def create_movies_table():
@@ -19,11 +19,11 @@ def create_movies_table():
             id INTEGER PRIMARY KEY,
             title VARCHAR (255) UNIQUE NOT NULL,
             genres VARCHAR (255) NOT NULL,
-            average_rating INTEGER NOT NULL
+            average_rating NUMERIC(5,2) NOT NULL
         )
     """
 
-    create_table(table_command)
+    run_db_command(table_command)
 
 
 def create_cbr_predictions_table():
@@ -34,8 +34,12 @@ def create_cbr_predictions_table():
             score NUMERIC(5,2) NOT NULL
         )
     """
+    index_command = """
+        CREATE INDEX IF NOT EXISTS idx_cbr_predictions_movie_id ON cbr_predictions(movie_id)
+    """
 
-    create_table(table_command)
+    run_db_command(table_command)
+    run_db_command(index_command)
 
 
 def create_svdpp_predictions_table():
@@ -47,10 +51,15 @@ def create_svdpp_predictions_table():
         )
     """
 
-    create_table(table_command)
+    index_command = """
+            CREATE INDEX IF NOT EXISTS idx_svdpp_predictions_user_id ON svdpp_predictions(user_id)
+        """
+
+    run_db_command(table_command)
+    run_db_command(index_command)
 
 
-def create_table(query):
+def run_db_command(query):
     conn = None
     cursor = None
     try:
