@@ -13,14 +13,14 @@ class NeptuneConfig(BaseModel):
 class PostgresConfig(BaseModel):
     user: str = os.getenv('POSTGRES_USER')
     password: str = os.getenv('POSTGRES_PASSWORD')
-    database: str = os.getenv('POSTGRES_DB')
+    dbname: str = os.getenv('POSTGRES_DB')
 
 
 class TableNames(BaseModel):
     user: str = "users"
     movie: str = "movies"
     cbr: str = "cbr_predictions"
-    svdpp: str = "svdpp_predictions"
+    svd: str = "svd_predictions"
 
 
 class Settings(BaseSettings):
@@ -31,9 +31,3 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-table_names = dict(
-    user="users",
-    movie="movies",
-    cbr="cbr_predictions",
-    svdpp="svdpp_predictions"
-)

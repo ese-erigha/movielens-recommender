@@ -4,7 +4,7 @@ import os
 
 def save_dataset(url, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    response = requests.request("GET", url)
+    response = requests.get(url)
 
-    with open(file_path, "w") as file:
-        file.write(response.text)
+    with open(file_path, "wb") as file:
+        file.write(response.content)
