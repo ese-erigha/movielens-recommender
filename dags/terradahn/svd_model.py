@@ -45,6 +45,8 @@ def save_recommendations(algo, ratings_df, movies_df):
 
         # Predict the ratings for the unrated movies
         predictions = [algo.predict(uid, movie_id) for movie_id in unrated_movies]
+        predictions = sorted(predictions, key=lambda x: x.est, reverse=True)
+
         for prediction in predictions:
             movie = movies_df[movies_df["movieId"] == prediction.iid]
             movie_id = movie['movieId'].values[0]
@@ -92,7 +94,7 @@ def build_model(ratings_dataset_path, movies_dataset_path, model_path):
                   'reg_all': [0.1, 0.4, 0.6]}
 
     # https://surprise.readthedocs.io/en/stable/getting_started.html#grid-search-usage-py
-    grid_search = GridSearchCV(SVD, param_grid, measures=['rmse'], cv=5, refit=True, n_jobs=-3, joblib_verbose=5)
+    grid_search = GridSearchCV(SVD, param_grid, measures=['rmse'], cv=5, refit=True, n_jobs=-2, joblib_verbose=5)
 
     logging.info("Building SVD model via GridSearch")
 
@@ -104,22 +106,27 @@ def build_model(ratings_dataset_path, movies_dataset_path, model_path):
     # No need to fit since we called refit=True in GridSearchCV
     # algo.fit(trainset)
 
+    logging.info("Saving Recommendation")
+
     # Create predictions for all users and save into database
     save_recommendations(algo, ratings_df, movies_df)
+
+    logging.info("Save to Pickle")
 
     # Save model to pickle
     save_to_pickle(algo, model_path)
 
     # Save model to Neptune.ai
     model_config = {
-        "key": 'SVD',
-        "name": "Item-based Recommender (SVD)",
-        "project": settings.neptune_config.project_name,
+        "model_key": 'SVD',
+        "model_name": "Item-based Recommender (SVD)",
+        "project_name": settings.neptune_config.project_name,
         "model_info": grid_search.best_params["rmse"],
         "model_path": model_path,
         "rmse": grid_search.best_score["rmse"],
     }
 
+    logging.info("Save to Neptune")
     save_to_neptune(model_config)
 
     # Save model to Neptune.ai

@@ -85,27 +85,35 @@ def build_model(dataset_path, model_path):
     movies_df = pd.read_csv(dataset_path)
     movies_df = clean_data(movies_df)
 
+    logging.info("Building TfidfVectorizer")
     # Build tf-idf vectorizer
     tfidf_vector = TfidfVectorizer(stop_words='english')
     tfidf_matrix = tfidf_vector.fit_transform(movies_df['genres_cleaned'])
 
+    logging.info("Building similarity matrix")
+
     # create the cosine similarity matrix
     sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
 
+    logging.info("Saving Recommendation")
+
     # Save similarity matrix to database
     save_recommendations(sim_matrix, movies_df)
+
+    # logging.info("Save to Pickle")
 
     # Save model to pickle
     # save_to_pickle(sim_matrix, model_path)
 
     # Save model to Neptune.ai
     model_config = {
-        "key": 'TFIDF',
-        "name": "Content Based Recommender",
-        "project": settings.neptune_config.project_name,
-        "model_info":  tfidf_vector.get_params(),
+        "model_key": 'TFIDF',
+        "model_name": "Content Based Recommender",
+        "project_name": settings.neptune_config.project_name,
+        "model_info": tfidf_vector.get_params(),
     }
 
+    logging.info("Save to Neptune")
     save_to_neptune(model_config)
     # model_name = settings.neptune_config.project_key + '-' + 'TFIDF'
     # neptune_model = init_neptune_model(model_name, settings.neptune_config.project_name)
