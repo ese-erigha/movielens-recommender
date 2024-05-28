@@ -16,10 +16,12 @@ model_path = f'{AIRFLOW_HOME}/dags/models/'
 # dataset remote url
 movies_dataset_url = "https://raw.githubusercontent.com/ese-erigha/movielens-recommender/main/dataset/movies.csv"
 ratings_dataset_url = "https://raw.githubusercontent.com/ese-erigha/movielens-recommender/main/dataset/ratings.csv"
+links_dataset_url = "https://raw.githubusercontent.com/ese-erigha/movielens-recommender/main/dataset/links.csv"
 
 # file path to save dataset
 movies_dataset_path = f'{dataset_path}movies.csv'
 ratings_dataset_path = f'{dataset_path}ratings.csv'
+links_dataset_path = f'{dataset_path}links.csv'
 
 # file path to save model
 svd_model_path = f'{model_path}svd_model.pkl'
@@ -42,6 +44,12 @@ with DAG(
             task_id="fetch_movies_task",
             python_callable=file_utils.save_dataset,
             op_kwargs={"url": movies_dataset_url, "file_path": movies_dataset_path}
+        )
+
+        fetch_links_task = PythonOperator(
+            task_id="fetch_links_task",
+            python_callable=file_utils.save_dataset,
+            op_kwargs={"url": links_dataset_url, "file_path": links_dataset_path}
         )
 
         [fetch_ratings_task, fetch_movies_task]
