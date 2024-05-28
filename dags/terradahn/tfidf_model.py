@@ -28,7 +28,7 @@ def clean_data(movies):
     return movies
 
 
-def save_recommendations(sim_matrix, df, n=settings.prediction_size):
+def save_recommendations(sim_matrix, df, n=100):
     # Create table
     create_cbr_predictions_table()
 

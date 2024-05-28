@@ -12,7 +12,7 @@ from .config import settings
 from .db_utils import insert_dataframe, create_svd_predictions_table, get_columns_from_dataframe
 
 
-def save_recommendations(algo, ratings_df, movies_df, n=settings.prediction_size):
+def save_recommendations(algo, ratings_df, movies_df):
     """
 
         Function to predict recommendations for each user
@@ -47,7 +47,7 @@ def save_recommendations(algo, ratings_df, movies_df, n=settings.prediction_size
         predictions = [algo.predict(uid, movie_id) for movie_id in unrated_movies]
         predictions = sorted(predictions, key=lambda x: x.est, reverse=True)
 
-        for prediction in predictions[:n]:
+        for prediction in predictions:
             movie = movies_df[movies_df["movieId"] == prediction.iid]
             movie_id = movie['movieId'].values[0]
             score = round(prediction.est, 2)

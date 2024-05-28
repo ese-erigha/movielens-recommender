@@ -4,7 +4,6 @@ import pandas as pd
 from .db_utils import insert_dataframe
 from .config import settings
 
-
 def insert_users_into_table(dataset_path):
     logging.info("ratings dataframe path "+ dataset_path)
     ratings_df = pd.read_csv(dataset_path)
