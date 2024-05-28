@@ -12,9 +12,12 @@ register_adapter(np.float64, AsIs)
 def get_columns_from_dataframe(dataframe):
     return ','.join(list(dataframe.columns))
 
+
 def get_connection():
-    return psycopg2.connect(dbname=settings.postgres_config.dbname, user=settings.postgres_config.user,
-                            password=settings.postgres_config.password, host="postgres")
+    return psycopg2.connect(dbname=settings.external_database_config.dbname, user=settings.external_database_config.user,
+                            password=settings.external_database_config.password, host=settings.external_database_config.host)
+    # return psycopg2.connect(dbname=settings.postgres_config.dbname, user=settings.postgres_config.user,
+    #                         password=settings.postgres_config.password, host="postgres")
 
 
 
