@@ -18,10 +18,10 @@ class PostgresConfig(BaseModel):
 
 
 class ExternalDatabaseConfig(BaseModel):
-    user: str = "postgres.kfajbfeftfaepqhslhyi"
-    password: str = "lexEME5195.."
-    dbname: str = "postgres"
-    host: str = "aws-0-us-west-1.pooler.supabase.com"
+    user: str = "<>"
+    password: str = "<>"
+    dbname: str = "<>"
+    host: str = "<>"
 
 
 class TableNames(BaseModel):
