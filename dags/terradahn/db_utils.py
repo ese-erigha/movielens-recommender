@@ -36,6 +36,7 @@ def create_movies_table():
             id INTEGER PRIMARY KEY,
             title VARCHAR (255) NOT NULL,
             genres VARCHAR (255) NOT NULL,
+            tmdb_id INTEGER NOT NULL,
             average_rating NUMERIC(5,2) NOT NULL
         )
     """

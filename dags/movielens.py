@@ -52,7 +52,7 @@ with DAG(
             op_kwargs={"url": links_dataset_url, "file_path": links_dataset_path}
         )
 
-        [fetch_ratings_task, fetch_movies_task]
+        [fetch_ratings_task, fetch_movies_task, fetch_links_task]
 
 
     @task_group()
@@ -81,7 +81,7 @@ with DAG(
         insert_movies_task = PythonOperator(
             task_id="insert_movies_task",
             python_callable=dataset_utils.insert_movies_into_table,
-            op_kwargs={"movies_dataset_path": movies_dataset_path, "ratings_dataset_path": ratings_dataset_path}
+            op_kwargs={"movies_dataset_path": movies_dataset_path, "ratings_dataset_path": ratings_dataset_path, "links_dataset_path": links_dataset_path}
         )
 
         create_movies_table_task >> insert_movies_task
@@ -104,4 +104,5 @@ with DAG(
         [build_svd_model_task, build_tfidf_model_task]
 
     fetch_datasets() >> create_users() >> create_movies() >> build_models()
+    # fetch_datasets() >> create_users() >> create_movies()
 
