@@ -1,6 +1,11 @@
 # movielens-recommender
 
-A recommender system for the movielens dataset. Recommender engine adopts content-based and item-based recommendation
+Aiflow pipeline for movie recommender system using movielens dataset. 
+
+Recommendation engine adopts
+
+- TF-IDF model using cosine similarity metric for movie similarity
+- Singular Vector Decomposition (SVD) for user/item-based  recommendation
 
 # https://airflow.apache.org/docs/apache-airflow/2.9.0/tutorial/pipeline.html
 
